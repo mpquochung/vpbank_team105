@@ -6,7 +6,7 @@ from langchain_community.chat_models import BedrockChat
 import os
 
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY'] #hide this
-def get_llm(streaming_callback = None, model: str = "gpt-3.5-turbo-0125", temperature = 0.1):
+def get_llm(streaming_callback = None, model: str = "gpt-3.5-turbo-0125", temperature = 0.7):
     if "gpt" in model:
         if streaming_callback:
             llm = ChatOpenAI(
@@ -37,12 +37,14 @@ def get_llm(streaming_callback = None, model: str = "gpt-3.5-turbo-0125", temper
                     model_kwargs=model_kwargs,
                     streaming=True,
                     callbacks=[streaming_callback],
+                    region_name = "us-east-1"
                 )
             else:
                 llm = Bedrock(
                     model_id= model,
                     model_kwargs=model_kwargs,
                     streaming=False,
+                    region_name = "us-east-1"
                 )
 
         #anthropic model
@@ -60,21 +62,23 @@ def get_llm(streaming_callback = None, model: str = "gpt-3.5-turbo-0125", temper
                     model_kwargs=model_kwargs,
                     streaming=True,
                     callbacks=[streaming_callback],
+                    region_name = "us-east-1"
                 )
             else:
                 llm = BedrockChat(
                     model_id= model,
                     model_kwargs=model_kwargs,
                     streaming=False,
+                    region_name = "us-east-1"
                 )
     return llm
 
 def get_embedding(text= None, model: str = "openai"):
     if "openai" in model:
-        embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)  #create a Embeddings client
+        embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY, model="text-embedding-3-large")  #create a Embeddings client
 
     else:
-        embeddings = BedrockEmbeddings() 
+        embeddings = BedrockEmbeddings(region_name = "us-east-1") 
     
     if text:
         return embeddings.embed_query(text)
